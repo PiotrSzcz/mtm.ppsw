@@ -3,6 +3,10 @@
 #define LED1_bm 0x20000 
 #define LED2_bm 0x40000 
 #define LED3_bm 0x80000 
+#define BUTT0_bm 0x10
+#define BUTT1_bm 0x20
+#define BUTT2_bm 0x40
+#define BUTT3_bm 0x80
 
 void Delay(int iIloscIteracji){
 	
@@ -13,57 +17,45 @@ void Delay(int iIloscIteracji){
 
 void LedInite (){
 	
-	IO1DIR = IO1DIR |(LED0_bm | LED1_bm | LED2_bm | LED3_bm);
-	IO1SET = LED0_bm;
+	IO1DIR = IO1DIR |(LED0_bm | LED1_bm | LED2_bm | LED3_bm); // Ustawia bez zmiany pozostalych rejestrów porty odpowadjace za diody 0,1,2,3 na wyjsciowe
+	IO1CLR = LED0_bm | LED1_bm | LED2_bm | LED3_bm;   // W przypadku gdyby diody byly wczesniej wlaczne gasi je 
+	IO1SET = LED0_bm;		// Zapala diode nr 0
 }
 
 void LedOn(unsigned char ucLedIndeks){
-	int iPrzesun;
-	
-	iPrzesun = 0x10000 << ucLedIndeks;
-	IO1CLR = 0xFF0000;
-	IO1DIR = iPrzesun;
-	IO1SET = iPrzesun;
-}
-/*
-void ReadButton1(){
-	if((IO1SET & 0x8) == 0){
-		IO1CLR = LED0_bm;
-		IO1SET = LED1_bm ;
-	}
-	if((IO1SET & 0x8) == 8){
-		IO1CLR = LED1_bm;
-		IO1SET = LED0_bm ;
-	}
-}
-*/
-/*
-enum ButtonState {RELASED, PRESSED};
-enum ButtonState ReadButton1(){
-    IO0DIR = IO0DIR |(0x10 | 0x20 | 0x40 | 0x80);
-		
-		if((IO0SET & 0x8) == 8){
-			return RELASED;
-		}
-		else{
-			return PRESSED;
+	IO1CLR = (LED0_bm | LED1_bm | LED2_bm | LED3_bm);
+	switch(ucLedIndeks){
+		case 0:
+			IO1SET = LED0_bm;
+			break;
+		case 1:
+			IO1SET = LED1_bm;
+			break;
+		case 2:
+			IO1SET = LED2_bm;
+			break;
+		case 3:
+			IO1SET = LED3_bm;
+			break;
+		default:
+			break;
 	}
 }
-*/
+ 
 enum KeyboardState {RELASED, BUTTON_0, BUTTON_1, BUTTON_2, BUTTON_3};
 
 enum KeyboardState eKeyboardRead(){
 	
-		if((IO0SET&0x10) == 0){
+		if((IO0PIN&BUTT0_bm) == 0){
 			return BUTTON_0;
 		}
-		if((IO0SET&0x20) == 0){
+		if((IO0PIN&BUTT1_bm) == 0){ //Gdy przycisk wcisniety zwraca 0x00 a puszczony 0x20
 			return BUTTON_1;
 		}
-		if((IO0SET&0x40) == 0){
+		if((IO0PIN&BUTT2_bm) == 0){  //Gdy przycisk wcismiety zwraca 0x00 a puszczony zwraca 0x40
 			return BUTTON_2;
 		}
-		if((IO0SET&0x80) == 0){
+		if((IO0PIN&BUTT3_bm) == 0){//Gdy przycisk wcismiety zwraca 0x00 a puszczony zwraca 0x80
 			return BUTTON_3;
 		}
 		else{
@@ -73,21 +65,8 @@ enum KeyboardState eKeyboardRead(){
 
 void KeyboardInit() {
 	
-		IO0DIR = IO0DIR | 0xF0;
+		IO0DIR = IO0DIR & ~(BUTT0_bm |BUTT1_bm | BUTT2_bm | BUTT3_bm);
 }
-/*
-void StepLeft() {
-	IO1DIR = IO1DIR |(LED0_bm | LED1_bm | LED2_bm | LED3_bm);
-		uiStepOper ++ ;
-		LedOn(uiStepOper % 4);
-}
-
-void StepRight() {
-    IO1DIR = IO1DIR |(LED0_bm | LED1_bm | LED2_bm | LED3_bm);
-		uiStepOper -- ;
-		LedOn(uiStepOper % 4);
-}
-*/
 
 
 enum LedDirection {LEFT, RIGHT};
@@ -98,36 +77,12 @@ void LedStep (enum LedDirection Direction){
 		switch(Direction) {
 			case(LEFT):
 				uiStepOper ++ ;
-				LedOn(uiStepOper % 4);
 				break;
 			case(RIGHT):
 				uiStepOper -- ;
-				LedOn(uiStepOper % 4);
 		}
+		LedOn(uiStepOper % 4);
 	
-}
-
-void ButtonToLed(int iButton){
-		static unsigned int uiStepOper = 4;
-	
-		if (iButton == BUTTON_1) {
-			while (iButton == BUTTON_1){
-				uiStepOper ++ ;
-				LedOn(uiStepOper % 4);
-		}
-		if (iButton == BUTTON_2){
-			while (iButton == BUTTON_2){
-				uiStepOper -- ;
-				LedOn(uiStepOper % 4);
-		}
-		if (iButton == RELASED) {
-			while (iButton == RELASED){
-				LedOn(uiStepOper);
-			}
-		}
-		else {}
-		}
-	}
 }
 
 void LedStepLeft() {
@@ -138,122 +93,25 @@ void LedStepRight() {
 	LedStep(RIGHT);
 }
 
+enum stan {stan1, stan2};
+enum stan ObecnyStan = stan1;
+
 int main(){
+	LedInite ();
 	while(1){
-	LedStepRight();
+		static int Counter;
+		switch(ObecnyStan){
+			case(stan1):
+				LedStepLeft();
+				Counter++;
+				if((Counter&4)==0){
+					ObecnyStan = stan2;
+				}
+				Delay(1000);
+			case(stan2):
+				LedStepRight();
+				Counter--;
+				Delay(1000);
+		}
 	}
-	/*
-	while(1){
-		LedStepRight() ;
-	}
-	*/
-	/*
-	IO1DIR = 0x10000;
-	IO1SET = 0x10000;
-	IO1CLR = 0x10000;
-	while(1){
-	}
-	*/
-	/*
-	while(1){
-		IO1DIR = 0x10000;
-		IO1SET = 0x10000;
-		IO1CLR = 0x10000;
-	}
-	*/
-	/*
-	while(1){
-		IO1DIR = LED0_bm;
-		IO1SET = LED0_bm;
-		Delay(1000);
-		IO1CLR = LED0_bm;
-		Delay(1000);
-	}
-	*/
-	/*
-	while(1){
-		IO1DIR = LED3_bm;
-		IO1SET = LED3_bm;
-		Delay(1000);
-		IO1CLR = LED3_bm;
-		Delay(1000);
-	}
-	*/
-	/*
-	IO1DIR = LED0_bm;
-	IO1DIR = LED1_bm;
-	IO1DIR = LED2_bm;
-	IO1DIR = LED3_bm;
-	IO1SET = LED0_bm;
-	IO1SET = LED1_bm;
-	IO1SET = LED2_bm;
-	IO1SET = LED3_bm;
-	*/
-	/*
-	IO1DIR = LED0_bm;
-	IO1DIR = LED1_bm;
-	IO1DIR = LED2_bm;
-	IO1DIR = LED3_bm;
-	IO1SET = LED0_bm;
-	Delay(250);
-	IO1CLR = LED0_bm;
-	IO1SET = LED1_bm;
-	Delay(250);
-	IO1CLR = LED1_bm;
-	IO1SET = LED2_bm;
-	Delay(250);
-	IO1CLR = LED2_bm;
-	IO1SET = LED3_bm;
-	Delay(250);
-	IO1CLR = LED3_bm;
-	*/
-  /*
-	Ledline();
-	Delay(250);
-	IO1CLR = LED0_bm;
-	IO1SET = LED1_bm;
-	Delay(250);
-	IO1CLR = LED1_bm;
-	IO1SET = LED2_bm;
-	Delay(250);
-	IO1CLR = LED2_bm;
-	IO1SET = LED3_bm;
-	Delay(250);
-	IO1CLR = LED3_bm;	
-	*/
-	/*
-	Ledline();
-	Delay(250);
-	LedOn(1);
-	Delay(250);
-	LedOn(2);
-	Delay(250);
-	LedOn(3);
-	*/
-	/*
-	switch(ReadButton1()){
-		case RELASED:
-			IO1SET = LED0_bm;
-		break;
-		
-		case PRESSED:
-			IO1SET = LED1_bm;
-		break;
-	}
-	*/
-	/*
-	switch (eKeyboardRead()){
-		case BUTTON_0:
-			IO1SET = LED0_bm;
-		case BUTTON_1:
-			IO1SET = LED1_bm;
-		case BUTTON_2:
-			IO1SET = LED2_bm;
-		case BUTTON_3:
-			IO1SET = LED3_bm;
-		default:
-			IO1SET = 0x0;
-	}
-	*/
-	
 }
