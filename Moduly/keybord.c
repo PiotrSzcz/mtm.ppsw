@@ -1,22 +1,22 @@
 #include <LPC21xx.H>
 #include "keybord.h"
-#define LED0_bm (1<<16)
-#define LED1_bm (1<<17)
-#define LED2_bm (1<<18)
-#define LED3_bm (1<<19)
+
+#define BUTT0_bm (1<<4)
+#define BUTT1_bm (1<<5)
+#define BUTT2_bm (1<<6)
+#define BUTT3_bm (1<<7)
 
 enum KeyboardState eKeyboardRead(){
 	
-		if(IO0SET == 0x10){
+		if((IO0PIN&BUTT0_bm) == 0){
 			return BUTTON_0;
 		}
-		if(IO0SET == 0x20){
-			return BUTTON_1;
+		if((IO0PIN&BUTT1_bm) == 0){ 
 		}
-		if(IO0SET == 0x40){
+		if((IO0PIN&BUTT2_bm) == 0){ 
 			return BUTTON_2;
 		}
-		if(IO0SET == 0x80){
+		if((IO0PIN&BUTT3_bm) == 0){
 			return BUTTON_3;
 		}
 		else{
