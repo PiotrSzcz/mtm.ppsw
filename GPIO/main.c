@@ -1,8 +1,10 @@
 #include <LPC21xx.H>
-#define LED0_bm 0x10000 
-#define LED1_bm 0x20000 
-#define LED2_bm 0x40000 
-#define LED3_bm 0x80000 
+
+#define LED0_bm 0x00040000 
+#define LED1_bm 0x00080000 
+#define LED2_bm 0x00100000 
+#define LED3_bm 0x00200000 
+
 #define BUTT0_bm 0x10
 #define BUTT1_bm 0x20
 #define BUTT2_bm 0x40
@@ -23,7 +25,7 @@ void LedInite (){
 }
 
 void LedOn(unsigned char ucLedIndeks){
-	IO1CLR = (LED0_bm | LED1_bm | LED2_bm | LED3_bm);
+	IO1CLR = LED0_bm | LED1_bm | LED2_bm | LED3_bm;
 	switch(ucLedIndeks){
 		case 0:
 			IO1SET = LED0_bm;
@@ -98,20 +100,25 @@ enum stan ObecnyStan = stan1;
 
 int main(){
 	LedInite ();
+	Delay(100);
 	while(1){
 		static int Counter;
 		switch(ObecnyStan){
 			case(stan1):
 				LedStepLeft();
 				Counter++;
-				if((Counter&4)==0){
+				if((Counter&3)==0){
 					ObecnyStan = stan2;
 				}
-				Delay(1000);
+				Delay(100);
+				break;
 			case(stan2):
 				LedStepRight();
-				Counter--;
-				Delay(1000);
+				Counter++;
+				if((Counter&3)==0){
+					ObecnyStan = stan1;
+				}
+				Delay(100);
 		}
 	}
 }
