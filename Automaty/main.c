@@ -1,8 +1,6 @@
 #include <LPC21xx.H>
 #include "led.h"
-#define BUTT0_bm 0x10
-#define BUTT1_bm 0x20
-#define BUTT2_bm 0x40
+#include "keybord.h"
 
 void Delay(int iIloscIteracji){
 	
@@ -30,43 +28,6 @@ void LedMove(){
 		Delay(1);
 	}
 }
-
-/*
-void WaveStep(){
-	
-	enum LedState {STATE0, STATE1, STATE2, STATE3, STATE4, STATE5};
-	enum LedState eLedState = STATE0;
-
-	while(1){
-		switch(eLedState){
-			case STATE0:
-				eLedState = STATE1;
-				LedStepLeft();
-				break;
-			case STATE1:
-				eLedState = STATE2;
-				LedStepLeft();
-				break;
-			case STATE2:
-				eLedState = STATE3;
-				LedStepLeft();
-				break;
-			case STATE3:
-				eLedState = STATE4;
-				LedStepRight();
-				break;
-			case STATE4:
-				eLedState = STATE5;
-				LedStepRight();
-				break;
-			case STATE5:
-				eLedState = STATE0;
-				LedStepRight();
-		}
-		Delay(100);
-	}
-}
-*/
 
 void WaveStep(){
 	
@@ -129,12 +90,12 @@ void InfiStepRight(){
 		switch(eLedState){
 			case(RightStep):
 				LedStepRight();
-				if((IO0PIN%BUTT0_bm)==0){
+				if(eKeyboardRead()==BUTTON_0){
 					eLedState = BreakStep;
 				}
 				break;
 			case(BreakStep):
-				if((IO0PIN%BUTT1_bm)==0) {
+				if(eKeyboardRead()==BUTTON_1) {
 					eLedState = RightStep;
 				}
 		}
@@ -151,34 +112,31 @@ void LeftRightStep(){
 		switch(eLedState){
 			case(RightStep):
 				LedStepRight();
-				if((IO0PIN&BUTT0_bm)==0){
-					eLedState = BreakStep;
-				}
-				if((IO0PIN&BUTT1_bm)==0){
+				if(eKeyboardRead()==BUTTON_1){
 					eLedState = BreakStep;
 				}
 				break;
 			case(LeftStep):
 				LedStepLeft();
-				if((IO0PIN&BUTT2_bm)==0){
-					eLedState = BreakStep;
-				}
-				if((IO0PIN&BUTT1_bm)==0){
+				if(eKeyboardRead()==BUTTON_1){
 					eLedState = BreakStep;
 				}
 				break;
 			case(BreakStep):
-				if((IO0PIN&BUTT0_bm)==0){
+				if(eKeyboardRead()==BUTTON_2){
 					eLedState = LeftStep;
 				}		
-				if((IO0PIN&BUTT2_bm)==0){
+				if(eKeyboardRead()==BUTTON_0){
 					eLedState = RightStep;
 				}		
 		}
-		Delay(10);
+		Delay(100);
 	}
 }
 
 int main(){
-	InfiStepRight();
+	LedInite();
+	LeftRightStep();
+
+
 }
