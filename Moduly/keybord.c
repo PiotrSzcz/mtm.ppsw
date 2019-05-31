@@ -26,5 +26,5 @@ enum KeyboardState eKeyboardRead(){
 
 void KeyboardInit() {
 	
-		IO0DIR = IO0DIR | 0xF0;
+		IO0DIR = IO0DIR | 0x0;
 }

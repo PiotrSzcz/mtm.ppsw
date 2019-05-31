@@ -135,6 +135,7 @@ void LeftRightStep(){
 }
 
 int main(){
+	KeyboardInit();
 	LedInite();
 	LeftRightStep();
 
