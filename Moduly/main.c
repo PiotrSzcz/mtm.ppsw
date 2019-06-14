@@ -1,4 +1,3 @@
-#include <LPC21xx.H>
 #include "led.h"
 #include "keybord.h"
 
@@ -12,6 +11,6 @@ void Delay(int iIloscIteracji){
 int main() {
 	while(1){
 		LedStepLeft();
-		Delay(1);
+		Delay(100);
 	}
 }
