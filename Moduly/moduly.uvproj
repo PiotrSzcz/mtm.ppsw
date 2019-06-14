@@ -417,6 +417,16 @@
               <FileType>5</FileType>
               <FilePath>.\led.h</FilePath>
             </File>
+            <File>
+              <FileName>keybord.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\keybord.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\timer.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

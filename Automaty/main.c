@@ -111,7 +111,7 @@ void RightWithStop(){
 				}
 				break;
 			case(StopStep):
-				if((IO0PIN&0x10) == 0){
+				if((IO0PIN&BUTT0_bm) == 0){
 					eLedState = RightStep;
 				}
 				break;
@@ -178,6 +178,35 @@ void LeftRightStep(){
 		Delay(10);
 	}
 }
+
+/*
+void MruganieXD(){
+	
+	enum LedState {MrugMrug, StopStep};
+	enum LedState eLedState = StopStep;
+	unsigned int MrugCounter;
+	
+	while(1){
+		switch(eLedState){
+			case(MrugMrug):
+				LedOn(1);
+				Delay(100);
+				LedOff(1);
+				MrugCounter ++ ;
+				
+				if (MrugCounter%10){
+					eLedState = StopStep;
+				}
+			break;
+			case(StopStep):
+				if(eKeybordRead == BUTT_4){
+					eLedState = MrugMrug;
+				}
+		}
+		Delay(100);
+	}
+}
+*/
 
 int main(){
 	InfiStepRight();
