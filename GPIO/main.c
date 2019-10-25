@@ -70,6 +70,8 @@ void KeyboardInit() {
 		IO0DIR = IO0DIR & ~(BUTT0_bm |BUTT1_bm | BUTT2_bm | BUTT3_bm);
 }
 
+//xd
+
 
 enum LedDirection {LEFT, RIGHT};
 
